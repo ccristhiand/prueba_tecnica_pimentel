@@ -1,0 +1,224 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+<div class="col-sm-12">
+    <div class="card">
+        <div class="card-header">
+            Prueba Tecnica Pimentel
+        </div>
+        <div class="card-body">
+
+
+            <table id="myTable" class="display table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Localizacion</th>
+                        <th>Email</th>
+                        <th>Edad</th>
+                        <th>Phone</th>
+                        <th>Usuario</th>
+                        <th>Control</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                
+
+                </tbody>
+            </table>
+        </div>
+        
+    </div>
+</div>
+
+<div class="modal fade" id="modalActualizar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Actualizar Datos</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+
+                    <div class="mb-3" e>
+                        <label for="recipient-name" class="col-form-label">Numero de Fila:</label>
+                        <input type="number" class="form-control" id="NumeroFila" visible ="false">
+                    </div>
+
+                    <div class="mb-3 row">
+                        <div class="col-4">
+                            <label for="recipient-name" class="col-form-label">Titulo:</label>
+                            <input type="text" class="form-control" id="Titulo">
+                        </div>
+                        <div class="col-4">
+                            <label for="recipient-name" class="col-form-label">Nombre:</label>
+                            <input type="text" class="form-control" id="Nombre">
+                        </div>
+                        <div class="col-4">
+                            <label for="recipient-name" class="col-form-label">Apellido:</label>
+                            <input type="text" class="form-control" id="Apellido">
+                        </div>
+                    </div>
+
+
+
+                    <div class="mb-3 row">
+                        <div class="col-3">
+                            <label for="message-text" class="col-form-label">ciudad:</label>
+                            <input type="text" class="form-control" id="LocalizacionCity">
+                        </div>
+                        <div class="col-3">
+                            <label for="message-text" class="col-form-label">estado:</label>
+                            <input type="text" class="form-control" id="LocalizacionState">
+                        </div>
+                        <div class="col-3">
+                            <label for="message-text" class="col-form-label">calle:</label>
+                            <input type="text" class="form-control" id="LocalizacionStreetName">
+                        </div>
+                        <div class="col-3">
+                            <label for="message-text" class="col-form-label">numero:</label>
+                            <input type="text" class="form-control" id="LocalizacionStreetNumber">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="message-text" class="col-form-label">Email:</label>
+                        <input type="text" class="form-control" id="email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="message-text" class="col-form-label">Edad:</label>
+                        <input type="text" class="form-control" id="edad">
+                    </div>
+                    <div class="mb-3">
+                        <label for="message-text" class="col-form-label">Phone:</label>
+                        <input type="text" class="form-control" id="phone">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="actualizarFila()" data-bs-dismiss="modal">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+
+        var table = $('#myTable').DataTable({
+            "ajax": {
+                "url": "https://randomuser.me/api/?results=50",
+                "type": "GET",
+                "dataSrc": "results"
+            },
+            "columns": [
+                {
+                    "data": null,
+                    "render": function (data, type, row) {
+                        return row.name.title + ' ' + row.name.first + ' ' + row.name.last;
+                    },
+                },
+                {
+                    "data": null,
+                    "render": function (data, type, row) {
+                        return row.location.city + ' ' + row.location.state + ' ' + row.location.street.name+ ' ' +row.location.street.number;
+                    },
+                },
+                { "data": "email" },
+                { "data": "dob.age" },
+                { "data": "phone" },
+                { "data": "login.username" },
+                {
+                    "data": 'login.username', "render": function (data, type, row) {
+                        return `<button class='btn btn-warning' type='button' onclick="abrirModal('${data}',this)">Actualizar</button>
+                                <button class='btn btn-danger ml-2' type='button' onclick="eliminar(this)">Eliminar</button>`
+                            } 
+                },
+            ],
+
+        });
+        function abrirModal(username,elemento) {
+
+            var file = $(elemento).closest('tr');
+            var numeroFila = table.row(file).index();
+
+            var fila = table.rows().data().filter(function (value) {
+                return value.login.username === username;
+            }).toArray()[0];
+
+            if (fila) {
+                $("#NumeroFila").val(numeroFila)
+                $("#Titulo").val(fila.name.title)
+                $("#Nombre").val(fila.name.first)
+                $("#Apellido").val(fila.name.last)
+
+                $("#LocalizacionCity").val(fila.location.city)
+                $("#LocalizacionState").val(fila.location.state)
+                $("#LocalizacionStreetName").val(fila.location.street.name)
+                $("#LocalizacionStreetNumber").val(fila.location.street.number)
+
+                $("#email").val(fila.email)
+                $("#edad").val(fila.dob.age)
+                $("#phone").val(fila.phone)
+
+                $("#modalActualizar").modal("show");
+            } else {
+                alert('No se encontró la fila');
+            }
+
+        }
+
+        function eliminar(elemento) {
+            var validate =confirm("Estas seguro de elimiar el regisrto");
+
+            if (validate) {
+
+                var fila = $(elemento).closest('tr');
+                var rowIndex = table.row(fila).index();
+                table.row(rowIndex).remove().draw(); 
+            }
+
+        }
+
+        function actualizarFila() {
+            var numeroFila = $("#NumeroFila").val();
+
+            var rowIndex = parseInt(numeroFila, 10);
+
+            if (rowIndex !== undefined) {
+                var rowData = table.row(rowIndex).data();
+
+                // Actualizar los datos de la fila
+                rowData.name.title = $("#Titulo").val();
+                rowData.name.first = $("#Nombre").val();
+                rowData.name.last = $("#Apellido").val();
+
+                rowData.location.city = $("#LocalizacionCity").val();
+                rowData.location.state = $("#LocalizacionState").val();
+                rowData.location.street.name = $("#LocalizacionStreetName").val();
+                rowData.location.street.number = $("#LocalizacionStreetNumber").val();
+
+                rowData.dob.age = $("#edad").val();
+                rowData.phone = $("#phone").val();
+                rowData.email = $("#email").val();
+
+                var validate = confirm("Estas seguro de actualizar");
+
+                if (validate){
+                    table.row(rowIndex).data(rowData).draw();
+                }
+               
+
+            } else {
+                console.error('No se pudo encontrar el índice de la fila.');
+            }
+        }
+
+    
+    </script>
+}
